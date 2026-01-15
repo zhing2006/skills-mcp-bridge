@@ -63,6 +63,7 @@ Context7 示例（需要 headers）：
 - `--token-env <ENV_VAR>`（自动加 `Authorization: Bearer <token>`）
 - `--timeout <ms>` / `--connect-timeout <ms>`
 - `--retry <count>` / `--retry-backoff <ms>`
+- `--name <name>`（仅用于 list 命令，按名称过滤）
 - `--require-capability`（调用前检查服务端能力）
 
 也可以使用 `<server>:<tool>` 或 `<server>:<prompt>` 来省略 `--server`。

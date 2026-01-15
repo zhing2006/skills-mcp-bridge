@@ -63,6 +63,7 @@ Common flags:
 - `--token-env <ENV_VAR>` (adds `Authorization: Bearer <token>`)
 - `--timeout <ms>` / `--connect-timeout <ms>`
 - `--retry <count>` / `--retry-backoff <ms>`
+- `--name <name>` (filter list-tools/resources/prompts by name)
 - `--require-capability` (checks server capabilities before calling)
 
 You can also use `<server>:<tool>` or `<server>:<prompt>` to avoid `--server`.

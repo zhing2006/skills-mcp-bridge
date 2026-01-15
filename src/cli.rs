@@ -32,6 +32,9 @@ pub struct ListArgs {
     pub cursor: Option<String>,
 
     #[arg(long)]
+    pub name: Option<String>,
+
+    #[arg(long)]
     pub require_capability: bool,
 }
 

@@ -45,7 +45,10 @@ async fn run() -> Result<RunOutput, AppError> {
                     .ensure_capability(mcp_client::CapabilityKind::Tools)
                     .await?;
             }
-            client.list_tools(args.cursor).await.map(RunOutput::Json)
+            client
+                .list_tools(args.cursor, args.name.as_deref())
+                .await
+                .map(RunOutput::Json)
         }
         cli::Command::ListResources(args) => {
             let connection = config::resolve_connection(&args.connection, cli.config)?;
@@ -56,7 +59,7 @@ async fn run() -> Result<RunOutput, AppError> {
                     .await?;
             }
             client
-                .list_resources(args.cursor)
+                .list_resources(args.cursor, args.name.as_deref())
                 .await
                 .map(RunOutput::Json)
         }
@@ -68,7 +71,10 @@ async fn run() -> Result<RunOutput, AppError> {
                     .ensure_capability(mcp_client::CapabilityKind::Prompts)
                     .await?;
             }
-            client.list_prompts(args.cursor).await.map(RunOutput::Json)
+            client
+                .list_prompts(args.cursor, args.name.as_deref())
+                .await
+                .map(RunOutput::Json)
         }
         cli::Command::CallTool(mut args) => {
             let tool = apply_server_from_target(&mut args.connection, &args.tool);
