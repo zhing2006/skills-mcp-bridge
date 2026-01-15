@@ -1,4 +1,4 @@
-# call-mcp
+# Agent Skills to MCP Bridge
 
 [English](README.md) | [中文](README_CN.md)
 
