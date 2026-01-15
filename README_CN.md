@@ -4,6 +4,10 @@
 
 call-mcp 是一个 Rust CLI，用于把传统 MCP 服务封装成可被 Agent Skills 调用的形式，方便 AI 在运行时使用 MCP 能力。
 
+## 文档
+
+- [Manual (中文)](docs/manual_CN.md) - 项目介绍、安装方法、如何创建自己的 MCP Skill
+
 ## 设计目的
 
 - 为 Agent Skills 提供稳定的命令行接口，调用 MCP 的 tools/resources/prompts。

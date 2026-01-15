@@ -4,6 +4,10 @@
 
 call-mcp is a Rust CLI that bridges Agent Skills-style workflows to MCP servers. The goal is to wrap traditional MCP services in a way that is easy for AI-driven skills to invoke at runtime.
 
+## Documentation
+
+- [Manual (English)](docs/manual.md) - Why this project, installation, and how to create your own MCP Skill
+
 ## Design Purpose
 
 - Provide a stable CLI for Agent Skills to call MCP tools, read resources, and fetch prompts.
