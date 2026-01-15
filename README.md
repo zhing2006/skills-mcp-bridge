@@ -18,11 +18,32 @@ call-mcp is a Rust CLI that bridges Agent Skills-style workflows to MCP servers.
 
 ## Build
 
+Install Rust (via rustup) if you cloned the repo:
+
 ```bash
-cargo build
+curl https://sh.rustup.rs -sSf | sh
 ```
 
-Release builds are manual by the user.
+On Windows (PowerShell, requires winget):
+
+```powershell
+winget install Rustlang.Rustup
+```
+
+Build the CLI:
+
+```bash
+# Build debug version
+cargo build
+
+# Build release version
+cargo build -r
+```
+
+The binary is written to:
+
+- Windows: `target/debug/call-mcp.exe`, `target/release/call-mcp.exe`
+- macOS/Linux: `target/debug/call-mcp`, `target/release/call-mcp`
 
 ## Configuration
 
@@ -80,34 +101,51 @@ code: mcp_service
 message: "Mcp error: -32601: Method not found"
 ```
 
+## Skill Development
+
+Use the examples in `examples/` as templates. Each skill should include:
+
+- `SKILL.md` with frontmatter (`name`, `description`) and a short workflow.
+- `assets/mcp.json` for per-skill MCP configuration.
+
+Typical pattern:
+
+```bash
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --name <tool>
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool <server>:<tool> --params '{...}'
+```
+
+Notes:
+
+- Use forward slashes in skill scripts, even on Windows.
+- Prefer `--name` when you want a single tool/prompt/resource.
+
 ## Examples (Context7)
 
 List tools:
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability
+./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability
 ```
 
 Resolve a library ID:
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json call-tool context7:resolve-library-id --require-capability --params '{"libraryName":"react","query":"How to use useEffect cleanup?"}'
+./target/debug/call-mcp.exe --config .mcp.json call-tool context7:resolve-library-id --require-capability --params '{"libraryName":"react","query":"How to use useEffect cleanup?"}'
 ```
 
 Query docs (use the libraryId from the previous step):
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json call-tool context7:query-docs --require-capability --params '{"libraryId":"/facebook/react","query":"useEffect cleanup examples"}'
+./target/debug/call-mcp.exe --config .mcp.json call-tool context7:query-docs --require-capability --params '{"libraryId":"/facebook/react","query":"useEffect cleanup examples"}'
 ```
 
 Get server info (capabilities, etc.):
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json get-info --server context7
+./target/debug/call-mcp.exe --config .mcp.json get-info --server context7
 ```
 
 Notes:
 
-- `call-tool` prints progress/logging notifications as they arrive, then prints the final tool result as plain text.
-- `get-prompt` and `read-resource` also return plain text on success.
 - Use `--require-capability` to avoid calling unsupported commands.

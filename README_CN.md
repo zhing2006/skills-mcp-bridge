@@ -18,11 +18,32 @@ call-mcp 是一个 Rust CLI，用于把传统 MCP 服务封装成可被 Agent Sk
 
 ## 构建
 
+如果是从源码拉取，先安装 Rust（建议用 rustup）：
+
 ```bash
-cargo build
+curl https://sh.rustup.rs -sSf | sh
 ```
 
-Release 版本由用户手动构建。
+Windows（PowerShell，需要 winget）：
+
+```powershell
+winget install Rustlang.Rustup
+```
+
+编译：
+
+```bash
+# 构建 Debug 版
+cargo build
+
+# 构建 Release 版
+cargo build -r
+```
+
+可执行文件位置：
+
+- Windows: `target//debug//call-mcp.exe`, `target//release//call-mcp.exe`
+- macOS/Linux: `target/debug/call-mcp`， `target/release/call-mcp`
 
 ## 配置
 
@@ -80,34 +101,51 @@ code: mcp_service
 message: "Mcp error: -32601: Method not found"
 ```
 
+## Skill 开发
+
+参考 `examples/` 里的模板。一个 skill 通常包含：
+
+- `SKILL.md`（带 frontmatter：`name`、`description`，再写简短流程）
+- `assets/mcp.json`（每个 skill 的 MCP 配置）
+
+常用调用模式：
+
+```bash
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --name <tool>
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool <server>:<tool> --params '{...}'
+```
+
+说明：
+
+- skill 脚本路径统一用 `/`，即使在 Windows。
+- 只想拿单个 tool/prompt/resource 时优先用 `--name`。
+
 ## 使用示例（Context7）
 
 列出工具：
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability
+./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability
 ```
 
 解析库 ID：
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json call-tool context7:resolve-library-id --require-capability --params '{"libraryName":"react","query":"How to use useEffect cleanup?"}'
+./target/debug/call-mcp.exe --config .mcp.json call-tool context7:resolve-library-id --require-capability --params '{"libraryName":"react","query":"How to use useEffect cleanup?"}'
 ```
 
 查询文档（使用上一步返回的 libraryId）：
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json call-tool context7:query-docs --require-capability --params '{"libraryId":"/facebook/react","query":"useEffect cleanup examples"}'
+./target/debug/call-mcp.exe --config .mcp.json call-tool context7:query-docs --require-capability --params '{"libraryId":"/facebook/react","query":"useEffect cleanup examples"}'
 ```
 
 查看服务端信息（capabilities 等）：
 
 ```powershell
-.\target\debug\call-mcp.exe --config .mcp.json get-info --server context7
+./target/debug/call-mcp.exe --config .mcp.json get-info --server context7
 ```
 
 说明：
 
-- `call-tool` 会实时输出 progress/logging 通知，然后输出最终结果文本。
-- `get-prompt` 和 `read-resource` 成功时输出纯文本。
 - 建议使用 `--require-capability` 避免调用不支持的命令。
