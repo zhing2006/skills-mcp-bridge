@@ -1,15 +1,38 @@
 use crate::errors::AppError;
-use rmcp::model::{ListPromptsResult, PaginatedRequestParam};
+use rmcp::model::{ListPromptsResult, PaginatedRequestParam, Prompt};
 use serde_json::Value;
 
 use super::McpClient;
 use super::util::{json_value, map_service_error};
+
+#[derive(serde::Serialize)]
+struct ShortPrompt {
+    name: String,
+    description: Option<String>,
+}
+
+impl From<Prompt> for ShortPrompt {
+    fn from(prompt: Prompt) -> Self {
+        ShortPrompt {
+            name: prompt.name,
+            description: prompt.description,
+        }
+    }
+}
+
+#[derive(serde::Serialize)]
+struct ShortPromptsResult {
+    prompts: Vec<ShortPrompt>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    next_cursor: Option<String>,
+}
 
 impl McpClient {
     pub async fn list_prompts(
         &self,
         cursor: Option<String>,
         name: Option<&str>,
+        short: bool,
     ) -> Result<Value, AppError> {
         self.retry("list-prompts", || async {
             let service = self.connect(false).await?;
@@ -44,6 +67,11 @@ impl McpClient {
                             "not_found",
                             format!("Prompt '{}' not found", name),
                         ))
+                    } else if short {
+                        json_value(ShortPromptsResult {
+                            prompts: matched.into_iter().map(ShortPrompt::from).collect(),
+                            next_cursor: None,
+                        })
                     } else {
                         json_value(ListPromptsResult::with_all_items(matched))
                     }
@@ -57,7 +85,14 @@ impl McpClient {
                         .list_prompts(params)
                         .await
                         .map_err(map_service_error)?;
-                    json_value(result)
+                    if short {
+                        json_value(ShortPromptsResult {
+                            prompts: result.prompts.into_iter().map(ShortPrompt::from).collect(),
+                            next_cursor: result.next_cursor,
+                        })
+                    } else {
+                        json_value(result)
+                    }
                 }
             };
             let _ = service.cancel().await;

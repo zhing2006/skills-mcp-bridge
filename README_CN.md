@@ -89,6 +89,7 @@ Context7 示例（需要 headers）：
 - `--timeout <ms>` / `--connect-timeout <ms>`
 - `--retry <count>` / `--retry-backoff <ms>`
 - `--name <name>`（仅用于 list 命令，按名称过滤）
+- `--short`（简短模式，仅显示名称和描述，用于工具发现）
 - `--require-capability`（调用前检查服务端能力）
 
 也可以使用 `<server>:<tool>` 或 `<server>:<prompt>` 来省略 `--server`。
@@ -115,18 +116,31 @@ message: "Mcp error: -32601: Method not found"
 常用调用模式：
 
 ```bash
+# STEP 1: 获取所有可用工具（简短模式，用于发现）
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --short
+
+# STEP 2: 获取特定工具的详细信息和调用参数
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --name <tool>
+
+# STEP 3: 调用工具
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool <server>:<tool> --params '{...}'
 ```
 
 说明：
 
 - skill 脚本路径统一用 `/`，即使在 Windows。
-- 只想拿单个 tool/prompt/resource 时优先用 `--name`。
+- 用 `--short` 进行工具发现（只返回名称和描述）。
+- 用 `--name` 获取特定工具的详细参数。
 
 ## 使用示例（Context7）
 
-列出工具：
+列出工具（简短模式，用于发现）：
+
+```powershell
+./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --short
+```
+
+列出工具（完整详情）：
 
 ```powershell
 ./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability

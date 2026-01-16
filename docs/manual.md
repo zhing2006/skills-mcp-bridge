@@ -119,21 +119,21 @@ description: Brief description of what this Skill does. AI uses this to decide w
 
 Describe the capabilities this Skill provides.
 
-## Available Tools
-
-### tool-name-1
-Brief description of tool purpose.
-
-### tool-name-2
-Brief description of tool purpose.
-
 ## Workflow
 
-### STEP 1: Get Tool Details
+### STEP 1: Get All Available Tools
+
+If you already have the tools list, you can skip this step and proceed to STEP 2
+
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server your-service --short
+
+### STEP 2: Get Detail Information and Call Schema
+
+If you already have the call schema, you can skip this step and proceed to STEP 3
 
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server your-service --name {tool_name}
 
-### STEP 2: Call the Tool
+### STEP 3: Call the Tool
 
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool your-service:{tool_name} --params '{...}'
 
@@ -200,30 +200,22 @@ description: Query up-to-date documentation and code examples for any programmin
 - `name`: Unique identifier for the Skill
 - `description`: AI uses this to decide when to invoke the Skill (critical! be clear about the purpose)
 
-#### Available Tools Section
-
-```markdown
-### resolve-library-id
-Resolves a package/product name to a Context7-compatible library ID.
-
-### query-docs
-Retrieves documentation and code examples from Context7.
-```
-
-Here we **only list tool names and brief descriptions**, not the full parameter Schema. This is the core of progressive disclosure—AI fetches detailed parameters via `list-tools --name` only when needed.
-
 #### Workflow Section
 
 ```bash
-# STEP 1: Get detailed parameter Schema for the tool
+# STEP 1: Get all available tools (short mode for discovery)
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --short
+
+# STEP 2: Get detailed parameter Schema for the tool
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --name {tool_name}
 
-# STEP 2: Call the tool
+# STEP 3: Call the tool
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool context7:{tool_name} --params '{...}'
 ```
 
 - `{skill_dir}`: Automatically replaced by the framework with the actual Skill path
 - `{tool_name}`: AI replaces with the specific tool name as needed
+- `--short`: Returns only name and description for each tool, enabling quick discovery without loading full schemas
 
 #### Guidelines Section
 
@@ -238,7 +230,15 @@ Provides usage tips to help AI use tools correctly.
 
 Suppose a user asks: "How do I use React's useEffect?"
 
-**1. AI first gets resolve-library-id parameters:**
+**1. AI first discovers available tools:**
+
+```bash
+./call-mcp --config assets/mcp.json list-tools --server context7 --short
+```
+
+Returns a list of tools with names and descriptions. AI sees `resolve-library-id` and `query-docs`.
+
+**2. AI gets resolve-library-id parameters:**
 
 ```bash
 ./call-mcp --config assets/mcp.json list-tools --server context7 --name resolve-library-id
@@ -246,7 +246,7 @@ Suppose a user asks: "How do I use React's useEffect?"
 
 Returns the complete JSON Schema for the tool. AI learns it needs the `libraryName` parameter.
 
-**2. AI calls resolve-library-id:**
+**3. AI calls resolve-library-id:**
 
 ```bash
 ./call-mcp --config assets/mcp.json call-tool context7:resolve-library-id \
@@ -255,13 +255,13 @@ Returns the complete JSON Schema for the tool. AI learns it needs the `libraryNa
 
 Returns: `/facebook/react`
 
-**3. AI gets query-docs parameters:**
+**4. AI gets query-docs parameters:**
 
 ```bash
 ./call-mcp --config assets/mcp.json list-tools --server context7 --name query-docs
 ```
 
-**4. AI calls query-docs:**
+**5. AI calls query-docs:**
 
 ```bash
 ./call-mcp --config assets/mcp.json call-tool context7:query-docs \
@@ -273,8 +273,8 @@ Returns the latest React useEffect documentation and example code.
 ### Key Design Points
 
 1. **Be precise with description**: AI decides when to use based on this text—unclear descriptions won't get invoked
-2. **Keep tool descriptions brief**: Only describe purpose, not parameters—saves context
-3. **Query before calling**: Guidelines emphasize using `list-tools --name` to check parameters first
+2. **Use `--short` for discovery**: First get all tools with `--short` to see names and descriptions without loading full schemas
+3. **Query before calling**: Use `list-tools --name` to get detailed parameters for specific tools
 4. **Use forward slashes**: Even on Windows, use `/` for cross-platform compatibility
 
 ## Summary

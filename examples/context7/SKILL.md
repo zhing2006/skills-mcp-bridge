@@ -11,29 +11,25 @@ This skill enables querying the Context7 documentation service to retrieve up-to
 
 - Use forward slashes (`/`) for all script's paths, even on Windows.
 
-## Available Tools
-
-### resolve-library-id
-
-Resolves a package/product name to a Context7-compatible library ID and returns matching libraries.
-
-You MUST call this function before 'query-docs' to obtain a valid Context7-compatible library ID UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.
-
-### query-docs
-
-Retrieves and queries up-to-date documentation and code examples from Context7 for any programming library or framework.
-
-You must call 'resolve-library-id' first to obtain the exact Context7-compatible library ID required to use this tool, UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.
-
 ## Workflow
 
-### STEP 1: Get Detail Information and Call Schema
+### STEP 1: Get All Available Tools
+
+If you already have the tools list, you can skip this step and proceed to STEP 2
+
+```bash
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --short
+```
+
+### STEP 2: Get Detail Information and Call Schema
+
+If you already have the call schema, you can skip this step and proceed to STEP 3
 
 ```bash
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --name {tool_name}
 ```
 
-### STEP 2: Call the Tool
+### STEP 3: Call the Tool
 
 ```bash
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool context7:{tool_name} --params '{...}'

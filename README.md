@@ -89,6 +89,7 @@ Common flags:
 - `--timeout <ms>` / `--connect-timeout <ms>`
 - `--retry <count>` / `--retry-backoff <ms>`
 - `--name <name>` (filter list-tools/resources/prompts by name)
+- `--short` (short mode for list commands: only show name and description for tool discovery)
 - `--require-capability` (checks server capabilities before calling)
 
 You can also use `<server>:<tool>` or `<server>:<prompt>` to avoid `--server`.
@@ -115,18 +116,31 @@ Use the examples in `examples/` as templates. Each skill should include:
 Typical pattern:
 
 ```bash
+# STEP 1: Get all available tools (short mode for discovery)
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --short
+
+# STEP 2: Get detail information and call schema for a specific tool
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server <server> --name <tool>
+
+# STEP 3: Call the tool
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool <server>:<tool> --params '{...}'
 ```
 
 Notes:
 
 - Use forward slashes in skill scripts, even on Windows.
-- Prefer `--name` when you want a single tool/prompt/resource.
+- Use `--short` for tool discovery (only returns name and description).
+- Use `--name` when you need detailed parameters for a specific tool.
 
 ## Examples (Context7)
 
-List tools:
+List tools (short mode for discovery):
+
+```powershell
+./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --short
+```
+
+List tools (full details):
 
 ```powershell
 ./target/debug/call-mcp.exe --config .mcp.json list-tools --server context7 --require-capability

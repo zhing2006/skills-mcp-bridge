@@ -46,7 +46,7 @@ async fn run() -> Result<RunOutput, AppError> {
                     .await?;
             }
             client
-                .list_tools(args.cursor, args.name.as_deref())
+                .list_tools(args.cursor, args.name.as_deref(), args.short)
                 .await
                 .map(RunOutput::Json)
         }
@@ -59,7 +59,7 @@ async fn run() -> Result<RunOutput, AppError> {
                     .await?;
             }
             client
-                .list_resources(args.cursor, args.name.as_deref())
+                .list_resources(args.cursor, args.name.as_deref(), args.short)
                 .await
                 .map(RunOutput::Json)
         }
@@ -72,7 +72,7 @@ async fn run() -> Result<RunOutput, AppError> {
                     .await?;
             }
             client
-                .list_prompts(args.cursor, args.name.as_deref())
+                .list_prompts(args.cursor, args.name.as_deref(), args.short)
                 .await
                 .map(RunOutput::Json)
         }

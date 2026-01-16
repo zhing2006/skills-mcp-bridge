@@ -119,21 +119,21 @@ description: 简短描述这个 Skill 的用途，AI 会根据这个描述决定
 
 描述这个 Skill 提供的能力。
 
-## Available Tools
-
-### tool-name-1
-简要说明工具用途。
-
-### tool-name-2
-简要说明工具用途。
-
 ## Workflow
 
-### STEP 1: 获取工具详情
+### STEP 1: 获取所有可用工具
+
+如果你已经知道有哪些工具，可以跳过此步骤直接进入 STEP 2
+
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server your-service --short
+
+### STEP 2: 获取工具详情和调用参数
+
+如果你已经知道调用参数，可以跳过此步骤直接进入 STEP 3
 
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server your-service --name {tool_name}
 
-### STEP 2: 调用工具
+### STEP 3: 调用工具
 
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool your-service:{tool_name} --params '{...}'
 
@@ -200,30 +200,22 @@ description: Query up-to-date documentation and code examples for any programmin
 - `name`: Skill 的唯一标识符
 - `description`: AI 根据这段描述决定何时调用此 Skill（关键！写清楚用途）
 
-#### Available Tools 章节
-
-```markdown
-### resolve-library-id
-Resolves a package/product name to a Context7-compatible library ID.
-
-### query-docs
-Retrieves documentation and code examples from Context7.
-```
-
-这里**只列出工具名称和简要说明**，不包含完整的参数 Schema。这就是渐进式披露的核心——AI 需要时再通过 `list-tools --name` 获取详细参数。
-
 #### Workflow 章节
 
 ```bash
-# STEP 1: 获取工具的详细参数 Schema
+# STEP 1: 获取所有可用工具（简短模式，用于发现）
+{skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --short
+
+# STEP 2: 获取工具的详细参数 Schema
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json list-tools --server context7 --name {tool_name}
 
-# STEP 2: 调用工具
+# STEP 3: 调用工具
 {skill_dir}/call-mcp --config {skill_dir}/assets/mcp.json call-tool context7:{tool_name} --params '{...}'
 ```
 
 - `{skill_dir}`: 框架自动替换为 Skill 的实际路径
 - `{tool_name}`: AI 根据需要替换为具体工具名
+- `--short`: 只返回每个工具的名称和描述，用于快速发现，无需加载完整 Schema
 
 #### Guidelines 章节
 
@@ -238,7 +230,15 @@ Retrieves documentation and code examples from Context7.
 
 假设用户问："React 的 useEffect 怎么用？"
 
-**1. AI 先获取 resolve-library-id 的参数：**
+**1. AI 先发现可用工具：**
+
+```bash
+./call-mcp --config assets/mcp.json list-tools --server context7 --short
+```
+
+返回工具列表，包含名称和描述。AI 看到有 `resolve-library-id` 和 `query-docs`。
+
+**2. AI 获取 resolve-library-id 的参数：**
 
 ```bash
 ./call-mcp --config assets/mcp.json list-tools --server context7 --name resolve-library-id
@@ -246,7 +246,7 @@ Retrieves documentation and code examples from Context7.
 
 返回工具的完整 JSON Schema，AI 知道需要传 `libraryName` 参数。
 
-**2. AI 调用 resolve-library-id：**
+**3. AI 调用 resolve-library-id：**
 
 ```bash
 ./call-mcp --config assets/mcp.json call-tool context7:resolve-library-id \
@@ -255,13 +255,13 @@ Retrieves documentation and code examples from Context7.
 
 返回：`/facebook/react`
 
-**3. AI 获取 query-docs 的参数：**
+**4. AI 获取 query-docs 的参数：**
 
 ```bash
 ./call-mcp --config assets/mcp.json list-tools --server context7 --name query-docs
 ```
 
-**4. AI 调用 query-docs：**
+**5. AI 调用 query-docs：**
 
 ```bash
 ./call-mcp --config assets/mcp.json call-tool context7:query-docs \
@@ -273,8 +273,8 @@ Retrieves documentation and code examples from Context7.
 ### 设计要点
 
 1. **description 要精准**：AI 靠这段话判断何时使用，写不清楚就不会被调用
-2. **工具说明要简洁**：只写用途，不写参数，节省上下文
-3. **先查后调**：Guidelines 中强调先用 `list-tools --name` 查参数
+2. **用 `--short` 发现工具**：先用 `--short` 获取所有工具的名称和描述，无需加载完整 Schema
+3. **先查后调**：用 `list-tools --name` 获取特定工具的详细参数
 4. **路径用正斜杠**：即使 Windows 也用 `/`，确保跨平台兼容
 
 ## 总结

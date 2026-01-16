@@ -36,6 +36,10 @@ pub struct ListArgs {
 
     #[arg(long)]
     pub require_capability: bool,
+
+    /// Short mode: only show name and description for tool discovery
+    #[arg(long)]
+    pub short: bool,
 }
 
 #[derive(Debug, Args)]
