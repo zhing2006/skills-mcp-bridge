@@ -1,4 +1,5 @@
 use crate::types::Header;
+use crate::user_agent::UserAgentPreset;
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -113,11 +114,15 @@ pub struct ConnectionArgs {
     #[arg(long)]
     pub retry_backoff: Option<u64>,
 
-    #[arg(long)]
-    pub client_name: Option<String>,
+    /// User-Agent preset or custom string (default: chrome)
+    /// Presets: chrome, edge, firefox, safari, ie, claude-code, codex, gemini-cli, opencode, cursor
+    /// Or any custom User-Agent string
+    #[arg(long, value_parser = parse_user_agent)]
+    pub user_agent: Option<UserAgentPreset>,
+}
 
-    #[arg(long)]
-    pub client_version: Option<String>,
+fn parse_user_agent(raw: &str) -> Result<UserAgentPreset, String> {
+    raw.parse()
 }
 
 fn parse_header(raw: &str) -> Result<Header, String> {

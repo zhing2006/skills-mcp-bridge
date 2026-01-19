@@ -1,8 +1,9 @@
 use crate::config::ResolvedConnection;
 use crate::errors::AppError;
 use crate::types::Header;
+use crate::user_agent::UserAgentPreset;
 use backoff::ExponentialBackoff;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use rmcp::model::ClientInfo;
 use std::time::Duration;
 
@@ -18,8 +19,19 @@ pub(crate) fn build_http_client(
     headers: &HeaderMap,
     timeout_ms: Option<u64>,
     connect_timeout_ms: Option<u64>,
+    user_agent: &UserAgentPreset,
 ) -> Result<reqwest::Client, AppError> {
-    let mut builder = reqwest::Client::builder().default_headers(headers.clone());
+    let mut final_headers = headers.clone();
+
+    // Apply User-Agent if not already set in headers
+    if !final_headers.contains_key(USER_AGENT) {
+        let ua = HeaderValue::from_str(user_agent.user_agent()).map_err(|err| {
+            AppError::new("invalid_header", format!("Invalid User-Agent value: {err}"))
+        })?;
+        final_headers.insert(USER_AGENT, ua);
+    }
+
+    let mut builder = reqwest::Client::builder().default_headers(final_headers);
     if let Some(timeout) = timeout_ms {
         builder = builder.timeout(Duration::from_millis(timeout));
     }
@@ -77,11 +89,10 @@ fn parse_bearer_token(value: &str) -> Option<String> {
 
 pub(crate) fn build_client_info(connection: &ResolvedConnection) -> ClientInfo {
     let mut info = ClientInfo::default();
-    if let Some(name) = &connection.client_name {
-        info.client_info.name = name.clone();
-    }
-    if let Some(version) = &connection.client_version {
-        info.client_info.version = version.clone();
-    }
+
+    // Use user_agent preset for client name and version
+    info.client_info.name = connection.user_agent.client_name().to_string();
+    info.client_info.version = connection.user_agent.client_version().to_string();
+
     info
 }

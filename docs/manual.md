@@ -105,6 +105,17 @@ Supported authentication methods:
 - `headers`: Custom HTTP headers (including API keys)
 - `--token-env`: Read Bearer Token from environment variable
 
+User-Agent setting (default: Chrome):
+
+- `--user-agent chrome`: Chrome browser (default)
+- `--user-agent claude-code`: Claude Code CLI
+- `--user-agent codex`: OpenAI Codex CLI
+- `--user-agent gemini-cli`: Google Gemini CLI
+- `--user-agent opencode`: OpenCode AI
+- `--user-agent cursor`: Cursor editor
+- More options: `edge`, `firefox`, `safari`, `ie`
+- Custom User-Agent: `--user-agent "MyApp/1.0"`
+
 ### Step 3: Write SKILL.md
 
 SKILL.md is the core of a Skill, containing frontmatter metadata and usage instructions:
@@ -177,6 +188,7 @@ context7/
 - `type`: Must be `http`, this project only supports HTTP Streamable
 - `url`: MCP service endpoint, obtained from the service provider's documentation
 - `headers`: HTTP request headers for authentication
+- `user_agent`: Optional User-Agent setting (e.g., `chrome`, `claude-code`, `codex`, defaults to `chrome`)
 
 **How to get the API Key:**
 

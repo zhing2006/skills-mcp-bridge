@@ -105,6 +105,17 @@ my-skill/
 - `headers`: 自定义 HTTP 头（包括 API Key）
 - `--token-env`: 从环境变量读取 Bearer Token
 
+User-Agent 设置（默认: Chrome）：
+
+- `--user-agent chrome`: Chrome 浏览器（默认）
+- `--user-agent claude-code`: Claude Code CLI
+- `--user-agent codex`: OpenAI Codex CLI
+- `--user-agent gemini-cli`: Google Gemini CLI
+- `--user-agent opencode`: OpenCode AI
+- `--user-agent cursor`: Cursor 编辑器
+- 更多选项：`edge`, `firefox`, `safari`, `ie`
+- 自定义 User-Agent：`--user-agent "MyApp/1.0"`
+
 ### 步骤 3：编写 SKILL.md
 
 SKILL.md 是 Skill 的核心，包含 frontmatter 元数据和使用说明：
@@ -177,6 +188,7 @@ context7/
 - `type`: 必须为 `http`，本项目只支持 HTTP Streamable
 - `url`: MCP 服务的端点地址，从服务提供商文档获取
 - `headers`: HTTP 请求头，用于传递认证信息
+- `user_agent`: 可选，User-Agent 设置（如 `chrome`, `claude-code`, `codex` 等，默认 `chrome`）
 
 **API Key 获取方式：**
 

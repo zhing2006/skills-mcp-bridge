@@ -1,6 +1,7 @@
 use crate::cli::ConnectionArgs;
 use crate::errors::AppError;
 use crate::types::Header;
+use crate::user_agent::UserAgentPreset;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -30,9 +31,7 @@ pub struct ServerEntry {
     #[serde(default, alias = "retry_backoff_ms")]
     pub retry_backoff: Option<u64>,
     #[serde(default)]
-    pub client_name: Option<String>,
-    #[serde(default)]
-    pub client_version: Option<String>,
+    pub user_agent: Option<String>,
 }
 
 #[allow(dead_code)]
@@ -44,8 +43,7 @@ pub struct ResolvedConnection {
     pub connect_timeout: Option<u64>,
     pub retry: Option<u32>,
     pub retry_backoff: Option<u64>,
-    pub client_name: Option<String>,
-    pub client_version: Option<String>,
+    pub user_agent: UserAgentPreset,
 }
 
 pub fn resolve_connection(
@@ -60,8 +58,7 @@ pub fn resolve_connection(
     let mut connect_timeout = args.connect_timeout;
     let mut retry = args.retry;
     let mut retry_backoff = args.retry_backoff;
-    let mut client_name = args.client_name.clone();
-    let mut client_version = args.client_version.clone();
+    let mut user_agent = args.user_agent.clone();
 
     if let Some(server) = &args.server {
         let Some(config) = config.as_ref() else {
@@ -98,11 +95,15 @@ pub fn resolve_connection(
         if retry_backoff.is_none() {
             retry_backoff = entry.retry_backoff;
         }
-        if client_name.is_none() {
-            client_name = entry.client_name.clone();
-        }
-        if client_version.is_none() {
-            client_version = entry.client_version.clone();
+        if user_agent.is_none() {
+            if let Some(ua_str) = &entry.user_agent {
+                user_agent = Some(ua_str.parse().map_err(|e| {
+                    AppError::new(
+                        "invalid_user_agent",
+                        format!("Invalid user_agent value: {e}"),
+                    )
+                })?);
+            }
         }
     }
 
@@ -121,6 +122,9 @@ pub fn resolve_connection(
     let url =
         url.ok_or_else(|| AppError::new("missing_connection", "Missing --url or --server value"))?;
 
+    // Default to Chrome if not specified
+    let user_agent = user_agent.unwrap_or_default();
+
     Ok(ResolvedConnection {
         url,
         headers,
@@ -128,8 +132,7 @@ pub fn resolve_connection(
         connect_timeout,
         retry,
         retry_backoff,
-        client_name,
-        client_version,
+        user_agent,
     })
 }
 

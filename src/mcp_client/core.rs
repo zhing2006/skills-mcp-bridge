@@ -48,6 +48,7 @@ impl McpClient {
             &headers,
             self.connection.timeout,
             self.connection.connect_timeout,
+            &self.connection.user_agent,
         )?;
         let mut config =
             rmcp::transport::streamable_http_client::StreamableHttpClientTransportConfig::with_uri(

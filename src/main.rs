@@ -4,6 +4,7 @@ mod errors;
 mod mcp_client;
 mod output;
 mod types;
+mod user_agent;
 
 use clap::Parser;
 use errors::AppError;
