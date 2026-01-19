@@ -20,6 +20,7 @@ impl McpClient {
                     .call_tool(CallToolRequestParam {
                         name: Cow::Owned(tool),
                         arguments,
+                        task: None,
                     })
                     .await
                     .map_err(map_service_error)?;

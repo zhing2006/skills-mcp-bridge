@@ -2,9 +2,10 @@ use std::fmt;
 use std::str::FromStr;
 
 /// Predefined User-Agent presets.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum UserAgentPreset {
     /// Google Chrome browser (default)
+    #[default]
     Chrome,
     /// Microsoft Edge browser
     Edge,
@@ -26,12 +27,6 @@ pub enum UserAgentPreset {
     Cursor,
     /// Custom User-Agent string
     Custom(String),
-}
-
-impl Default for UserAgentPreset {
-    fn default() -> Self {
-        UserAgentPreset::Chrome
-    }
 }
 
 impl UserAgentPreset {

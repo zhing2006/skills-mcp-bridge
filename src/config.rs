@@ -95,15 +95,15 @@ pub fn resolve_connection(
         if retry_backoff.is_none() {
             retry_backoff = entry.retry_backoff;
         }
-        if user_agent.is_none() {
-            if let Some(ua_str) = &entry.user_agent {
-                user_agent = Some(ua_str.parse().map_err(|e| {
-                    AppError::new(
-                        "invalid_user_agent",
-                        format!("Invalid user_agent value: {e}"),
-                    )
-                })?);
-            }
+        if user_agent.is_none()
+            && let Some(ua_str) = &entry.user_agent
+        {
+            user_agent = Some(ua_str.parse().map_err(|e| {
+                AppError::new(
+                    "invalid_user_agent",
+                    format!("Invalid user_agent value: {e}"),
+                )
+            })?);
         }
     }
 
