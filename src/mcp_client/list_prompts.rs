@@ -1,5 +1,5 @@
 use crate::errors::AppError;
-use rmcp::model::{ListPromptsResult, PaginatedRequestParam, Prompt};
+use rmcp::model::{ListPromptsResult, PaginatedRequestParams, Prompt};
 use serde_json::Value;
 
 use super::McpClient;
@@ -42,9 +42,7 @@ impl McpClient {
                     let mut matched = Vec::new();
 
                     loop {
-                        let params = next.clone().map(|cursor| PaginatedRequestParam {
-                            cursor: Some(cursor),
-                        });
+                        let params = next.clone().map(|cursor| PaginatedRequestParams::default().with_cursor(Some(cursor)));
                         let result = service
                             .peer()
                             .list_prompts(params)
@@ -77,9 +75,7 @@ impl McpClient {
                     }
                 }
                 None => {
-                    let params = cursor.clone().map(|cursor| PaginatedRequestParam {
-                        cursor: Some(cursor),
-                    });
+                    let params = cursor.clone().map(|cursor| PaginatedRequestParams::default().with_cursor(Some(cursor)));
                     let result = service
                         .peer()
                         .list_prompts(params)

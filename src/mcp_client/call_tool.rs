@@ -1,5 +1,5 @@
 use crate::errors::AppError;
-use rmcp::model::CallToolRequestParam;
+use rmcp::model::CallToolRequestParams;
 use serde_json::Value;
 use std::borrow::Cow;
 
@@ -17,10 +17,12 @@ impl McpClient {
                 let arguments = value_to_object(params, "params")?;
                 let result = service
                     .peer()
-                    .call_tool(CallToolRequestParam {
-                        name: Cow::Owned(tool),
-                        arguments,
-                        task: None,
+                    .call_tool({
+                        let mut params = CallToolRequestParams::new(Cow::<'static, str>::Owned(tool));
+                        if let Some(args) = arguments {
+                            params = params.with_arguments(args);
+                        }
+                        params
                     })
                     .await
                     .map_err(map_service_error)?;

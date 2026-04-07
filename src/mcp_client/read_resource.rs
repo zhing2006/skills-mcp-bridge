@@ -1,5 +1,5 @@
 use crate::errors::AppError;
-use rmcp::model::ReadResourceRequestParam;
+use rmcp::model::ReadResourceRequestParams;
 
 use super::McpClient;
 use super::text::resource_contents_to_text;
@@ -13,7 +13,7 @@ impl McpClient {
                 let service = self.connect(false).await?;
                 let result = service
                     .peer()
-                    .read_resource(ReadResourceRequestParam { uri })
+                    .read_resource(ReadResourceRequestParams::new(uri))
                     .await
                     .map_err(map_service_error)?;
                 let _ = service.cancel().await;
