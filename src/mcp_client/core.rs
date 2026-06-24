@@ -101,6 +101,7 @@ impl McpClient {
             let service = self.connect(false).await?;
             let info = service
                 .peer_info()
+                .as_deref()
                 .cloned()
                 .ok_or_else(|| AppError::new("missing_server_info", "Server info not available"))?;
             let _ = service.cancel().await;
